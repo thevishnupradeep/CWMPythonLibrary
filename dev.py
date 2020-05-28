@@ -1,3 +1,11 @@
 from codewatchman.watchman import watchman
-instance = watchman(tokenId="19UYyGqfVWWNX8uiA5o9", accessToken="a44e75c6e4e01590564553")
+from codewatchman.watchmanlog import watchmanlog
+
+instance = watchman(tokenId="sHltDBIyEcXoJB1o3Kbb", accessToken="3fbaca5d18c81590694822")
 print("Validation Status", instance.is_validated, instance.validation_message)
+
+first_log = watchmanlog("This is a test log", { "test": True })
+
+instance.send_log(first_log)
+
+print("This is to let you konw that the script is complete.")
