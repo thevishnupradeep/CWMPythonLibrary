@@ -4,6 +4,8 @@ import requests
 import codewatchman.watchmanlog as watchmanlog
 
 class watchman:
+    # url = 'http://localhost:5001/codewatchman/us-central1/makeLog'
+    url = 'https://us-central1-codewatchman.cloudfunctions.net'
     def __init__(self, tokenId, accessToken):
         print(tokenId, accessToken)
         self.tokenId = tokenId
@@ -14,11 +16,9 @@ class watchman:
         self.checkTokenValidity()
 
     def checkTokenValidity(self):
-        url = 'http://localhost:5001/codewatchman/us-central1/validateToken'
-        # url = 'https://us-central1-codewatchman.cloudfunctions.net/validateToken'
-
+        finalURL = '{}/validateToken'.format(self.url)
         response = requests.post(
-            url,
+            finalURL,
             json={
                 "tokenId": self.tokenId,
                 "accessToken": self.accessToken
@@ -43,6 +43,10 @@ class watchman:
             self.validation_message = response_data
 
     def send_log(self, log_data):
+        if self.is_validated is False:
+            print("Token validation has failed.")
+            return
+
         if type(log_data) is not watchmanlog.watchmanlog:
             print("Use watchmanlog class to build log object")
             return
@@ -51,16 +55,14 @@ class watchman:
 
 
     def _sendlog(self, log_data):
-        url = 'http://localhost:5001/codewatchman/us-central1/makeLog'
-        # url = 'https://us-central1-codewatchman.cloudfunctions.net/makeLog'
-
         if type(log_data.payload) is dict:
             payload = json.dumps(log_data.payload)
         else:
             payload = json.dumps({})
 
+        finalURL = '{}/makeLog'.format(self.url)
         response = requests.post(
-            url,
+            finalURL,
             json={
                 "tokenId": self.tokenId,
                 "accessToken": self.accessToken,
