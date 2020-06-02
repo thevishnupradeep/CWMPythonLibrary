@@ -1,11 +1,15 @@
 import json
 import requests
+import asyncio
 
 import codewatchman.watchmanlog as watchmanlog
 
 class watchman:
     # url = 'http://localhost:5001/codewatchman/us-central1/makeLog'
     url = 'https://us-central1-codewatchman.cloudfunctions.net'
+
+    watchmantasks = asyncio.Queue()
+
     def __init__(self, tokenId, accessToken):
         print(tokenId, accessToken)
         self.tokenId = tokenId
@@ -13,9 +17,10 @@ class watchman:
         self.is_validated = False
         self.validation_message = None
 
-        self.checkTokenValidity()
+    async def checkTokenValidity(self):
+        if self.is_validated == True:
+            return
 
-    def checkTokenValidity(self):
         finalURL = '{}/validateToken'.format(self.url)
         response = requests.post(
             finalURL,
@@ -42,19 +47,19 @@ class watchman:
             self.is_validated = False
             self.validation_message = response_data
 
-    def send_log(self, log_data):
+    async def send_log(self, log_data):
         if self.is_validated is False:
-            print("Token validation has failed.")
+            await self.checkTokenValidity()
             return
 
         if type(log_data) is not watchmanlog.watchmanlog:
             print("Use watchmanlog class to build log object")
             return
         else:
-            self._sendlog(log_data)
+            await self._sendlog(log_data)
 
 
-    def _sendlog(self, log_data):
+    async def _sendlog(self, log_data):
         if type(log_data.payload) is dict:
             payload = json.dumps(log_data.payload)
         else:
@@ -84,3 +89,6 @@ class watchman:
             print("Data logged")
         except ValueError:
             print(response_data)
+
+    async def stop(self):
+        print("Stopping watchman")

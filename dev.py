@@ -1,3 +1,4 @@
+import asyncio
 from codewatchman.watchman import watchman
 from codewatchman.watchmanlog import watchmanlog
 
@@ -8,4 +9,5 @@ first_log = watchmanlog("IT IS WORKING!!!!!", { "test": True })
 
 instance.send_log(first_log)
 
+await instance.stop()
 print("This is to let you konw that the script is complete.")
