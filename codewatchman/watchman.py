@@ -1,6 +1,7 @@
 import json
 import requests
 import asyncio
+import logging
 
 import codewatchman.watchmanlog as watchmanlog
 
@@ -23,18 +24,19 @@ def make_cwm_request(
             headers=headers,
             timeout=10
         )
-        print("Request complete.", response)
+        logging.info("Request complete. {}".format(response))
 
         response_data = response.content.decode('utf8').replace("'", '"')
         response_json = json.loads(response_data)
 
         return response_json
     except Exception as e:
-        print("Error @ Code Watchman", e)
+        logging.debug("Error @ Code Watchman")
+        logging.exception(e)
 
 class watchman:
     def __init__(self, token_id, access_token):
-        print(token_id, access_token)
+        logging.info("Logging Id and Token: {} {}".format(token_id, access_token))
         self.token_id = token_id
         self.access_token = access_token
         self.is_validated = False
@@ -52,7 +54,7 @@ class watchman:
                 "accessToken": self.access_token
             }
         )
-        print("Checking Validity", response)
+        logging.debug("Checking Validity: {}".format(json.dumps(response)))
         if response["status"] == "ok":
             self.is_validated = True
 
@@ -62,7 +64,7 @@ class watchman:
             self.check_token_validity()
 
         if type(log_data) is not watchmanlog.watchmanlog:
-            print("Use watchmanlog class to build log object")
+            logging.info("Use watchmanlog class to build log object")
             return
         else:
             self._sendlog(log_data)
@@ -70,7 +72,7 @@ class watchman:
 
     def _sendlog(self, log_data):
         if log_data.is_valid != True:
-            print("Provided log data is not valid.")
+            logging.info("Provided log data is not valid.")
 
         if type(log_data.payload) is dict:
             payload = json.dumps(log_data.payload)
@@ -89,4 +91,4 @@ class watchman:
                 "logCode": log_data.log_code
             }
         )
-        print("Data logged", response)
+        logging.debug("Data logged: {}".format(json.dumps(response)))
