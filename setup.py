@@ -6,6 +6,7 @@ with open("../README.md", "r") as fh:
 setuptools.setup(
     name="cwm_codewatchman",
     version="0.0.1",
+    license="MIT",
     author="Code Watchman",
     author_email="codewatchmanapp@gmail.com",
     description="Code Watchman Python API.",
@@ -19,7 +20,9 @@ setuptools.setup(
         'License :: OSI Approved :: MIT License',
         'Intended Audience :: Developers'
     ],
+    keywords=["code watchman", "codewatchman", "watchman"],
     install_requires=[
+        'requests'
     ],
     python_requires='>=3.4'
 )
