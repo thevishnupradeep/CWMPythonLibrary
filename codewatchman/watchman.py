@@ -2,7 +2,7 @@ import json
 import requests
 import logging
 
-import WatchManLog
+from codewatchman.WatchmanLog import WatchmanLog
 
 def make_cwm_request(
     endpoint,
@@ -33,7 +33,7 @@ def make_cwm_request(
         logging.debug("Error @ Code Watchman")
         logging.exception(e)
 
-class WatchMan:
+class Watchman:
     def __init__(self, token_id, access_token):
         logging.info("Logging Id and Token: {} {}".format(token_id, access_token))
         self.token_id = token_id
@@ -62,7 +62,7 @@ class WatchMan:
         if self.is_validated is False:
             self.check_token_validity()
 
-        if type(log_data) is not WatchManLog.WatchManLog:
+        if type(log_data) is not WatchmanLog:
             logging.info("Use watchmanlog class to build log object")
             return
         else:

@@ -1,2 +1,2 @@
-from CodeWatchMan.WatchMan import WatchMan
-from CodeWatchMan.WatchManLog import WatchManLog
+from codewatchman.Watchman import Watchman
+from codewatchman.WatchmanLog import WatchmanLog

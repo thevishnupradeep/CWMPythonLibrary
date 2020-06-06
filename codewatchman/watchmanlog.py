@@ -1,4 +1,4 @@
-class WatchManLog:
+class WatchmanLog:
     message = None
     payload = None
     is_valid = True

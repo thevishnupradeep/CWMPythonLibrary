@@ -1,11 +1,11 @@
 import setuptools
 
-with open("../README.md", "r") as fh:
+with open("./README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="cwm_codewatchman",
-    version="0.0.1",
+    name="codewatchman",
+    version="0.0.2",
     license="MIT",
     author="Code Watchman",
     author_email="codewatchmanapp@gmail.com",
@@ -24,5 +24,6 @@ setuptools.setup(
     install_requires=[
         'requests'
     ],
-    python_requires='>=3.4'
+    python_requires='>=3.4',
+    download_url='https://github.com/thevishnupradeep/CWMPythonLibrary/archive/v0.0.1.tar.gz'
 )
