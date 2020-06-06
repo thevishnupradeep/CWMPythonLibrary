@@ -1,22 +1,24 @@
 class watchmanlog:
     message = None
     payload = None
-    isValid = True
+    is_valid = True
+    log_code = None
 
-    def __init__(self, message, payload):
+    def __init__(self, log_code, message, payload):
         self.message = message
         self.payload = payload
+        self.log_code = log_code
         self.validate()
 
     def validate(self):
-        if self.message is None:
-            print("Message is required.")
-            self.isValid = False
-        elif type(self.message) is not str:
-            print("Message is required.")
-            self.isValid = False
+        if self.message is None or type(self.message) is not str:
+            print("Invalid log data. Message is required.")
+            self.is_valid = False
 
-        if self.payload != None:
-            if type(self.payload) is not dict:
-                print("Payload has to be a python dictionary.")
-                self.isValid = False
+        if self.log_code is None or type(self.log_code) is not str:
+            print("Invalid log data. log_code is required and it has to be a string")
+            self.is_valid = False
+
+        if self.payload != None and type(self.payload) is not dict:
+            print("Invalid log data. Payload has to be a python dictionary.")
+            self.is_valid = False

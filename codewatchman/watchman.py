@@ -4,91 +4,89 @@ import asyncio
 
 import codewatchman.watchmanlog as watchmanlog
 
+def make_cwm_request(
+    endpoint,
+    json_data,
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+):
+    try:
+        # url = 'http://localhost:5001/codewatchman/us-central1'
+        url = 'https://us-central1-codewatchman.cloudfunctions.net'
+        final_url = '{}/{}'.format(url, endpoint)
+
+        response = requests.post(
+            final_url,
+            json=json_data,
+            headers=headers,
+            timeout=10
+        )
+        print("Request complete.", response)
+
+        response_data = response.content.decode('utf8').replace("'", '"')
+        response_json = json.loads(response_data)
+
+        return response_json
+    except Exception as e:
+        print("Error @ Code Watchman", e)
+
 class watchman:
-    # url = 'http://localhost:5001/codewatchman/us-central1/makeLog'
-    url = 'https://us-central1-codewatchman.cloudfunctions.net'
-
-    watchmantasks = asyncio.Queue()
-
-    def __init__(self, tokenId, accessToken):
-        print(tokenId, accessToken)
-        self.tokenId = tokenId
-        self.accessToken = accessToken
+    def __init__(self, token_id, access_token):
+        print(token_id, access_token)
+        self.token_id = token_id
+        self.access_token = access_token
         self.is_validated = False
         self.validation_message = None
+        self.check_token_validity()
 
-    async def checkTokenValidity(self):
+    def check_token_validity(self):
         if self.is_validated == True:
             return
 
-        finalURL = '{}/validateToken'.format(self.url)
-        response = requests.post(
-            finalURL,
-            json={
-                "tokenId": self.tokenId,
-                "accessToken": self.accessToken
-            },
-            headers={
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+        response = make_cwm_request(
+            endpoint="validateToken",
+            json_data={
+                "tokenId": self.token_id,
+                "accessToken": self.access_token
             }
         )
-
-        response_data = response.content.decode('utf8').replace("'", '"')
         print("Checking Validity", response)
-
-        try:
-            response_json = json.loads(response_data)
-            print("Final Check", response_json)
+        if response["status"] == "ok":
             self.is_validated = True
-            self.validation_message = response_json["message"]
-        except ValueError:
-            print(response_data)
-            self.is_validated = False
-            self.validation_message = response_data
 
-    async def send_log(self, log_data):
+
+    def send_log(self, log_data):
         if self.is_validated is False:
-            await self.checkTokenValidity()
-            return
+            self.check_token_validity()
 
         if type(log_data) is not watchmanlog.watchmanlog:
             print("Use watchmanlog class to build log object")
             return
         else:
-            await self._sendlog(log_data)
+            self._sendlog(log_data)
 
 
-    async def _sendlog(self, log_data):
+    def _sendlog(self, log_data):
+        if log_data.is_valid != True:
+            print("Provided log data is not valid.")
+
         if type(log_data.payload) is dict:
             payload = json.dumps(log_data.payload)
         else:
             payload = json.dumps({})
 
-        finalURL = '{}/makeLog'.format(self.url)
-        response = requests.post(
-            finalURL,
-            json={
-                "tokenId": self.tokenId,
-                "accessToken": self.accessToken,
+
+
+        response = make_cwm_request(
+            endpoint="makeLog",
+            json_data={
+                "tokenId": self.token_id,
+                "accessToken": self.access_token,
                 "message": log_data.message,
-                "payload": payload
-            },
-            headers={
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                "payload": payload,
+                "logCode": log_data.log_code
             }
         )
-
-        response_data = response.content.decode('utf8').replace("'", '"')
-        print("Checking log response", response)
-
-        try:
-            response_json = json.loads(response_data)
-            print("Final Check", response_json)
-            print("Data logged")
-        except ValueError:
-            print(response_data)
-
-    async def stop(self):
-        print("Stopping watchman")
+        print("Data logged", response)
