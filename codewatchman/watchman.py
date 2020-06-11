@@ -7,15 +7,18 @@ from codewatchman.WatchmanLog import WatchmanLog
 def make_cwm_request(
     endpoint,
     json_data,
+    Credentials = {},
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
 ):
     try:
-        # url = 'http://localhost:5001/codewatchman/us-central1'
-        url = 'https://us-central1-codewatchman.cloudfunctions.net'
+        url = 'http://localhost:8080/v1'
+        # url = 'https://app.codewatchman.com/v1'
         final_url = '{}/{}'.format(url, endpoint)
+        logging.info("Code Watchman URL: {}".format(final_url))
+        headers["Credentials"] = json.dumps(Credentials)
 
         response = requests.post(
             final_url,
@@ -47,11 +50,11 @@ class Watchman:
             return
 
         response = make_cwm_request(
-            endpoint="validateToken",
+            endpoint="token/validate",
             json_data={
                 "tokenId": self.token_id,
                 "accessToken": self.access_token
-            }
+            },
         )
         logging.debug("Checking Validity: {}".format(json.dumps(response)))
         if response["status"] == "ok":
@@ -81,13 +84,13 @@ class Watchman:
 
 
         response = make_cwm_request(
-            endpoint="makeLog",
+            endpoint="log",
             json_data={
-                "tokenId": self.token_id,
-                "accessToken": self.access_token,
                 "message": log_data.message,
                 "payload": payload,
-                "logCode": log_data.log_code
+                "logCode": log_data.log_code,
+                "tokenId": self.token_id,
+                "accessToken": self.access_token,
             }
         )
         logging.debug("Data logged: {}".format(json.dumps(response)))
