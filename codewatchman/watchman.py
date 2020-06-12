@@ -1,7 +1,7 @@
 import json
 import requests
 import logging
-
+from requests.exceptions import ConnectionError
 from codewatchman.WatchmanLog import WatchmanLog
 
 def make_cwm_request(
@@ -14,8 +14,8 @@ def make_cwm_request(
     }
 ):
     try:
-        url = 'http://localhost:8080/v1'
-        # url = 'https://app.codewatchman.com/v1'
+        # url = 'http://localhost:8080/v1'
+        url = 'https://app.codewatchman.com/v1'
         final_url = '{}/{}'.format(url, endpoint)
         logging.info("Code Watchman URL: {}".format(final_url))
         headers["Credentials"] = json.dumps(Credentials)
@@ -32,6 +32,9 @@ def make_cwm_request(
         response_json = json.loads(response_data)
 
         return response_json
+    except ConnectionError:
+        logging.debug("Code Watchman servers seems to be unavailable now")
+        return { "status": "error", "message": "Server unavailable." }
     except Exception as e:
         logging.debug("Error @ Code Watchman")
         logging.exception(e)
@@ -41,14 +44,9 @@ class Watchman:
         logging.info("Logging Id and Token: {} {}".format(token_id, access_token))
         self.token_id = token_id
         self.access_token = access_token
-        self.is_validated = False
         self.validation_message = None
-        self.check_token_validity()
 
     def check_token_validity(self):
-        if self.is_validated == True:
-            return
-
         response = make_cwm_request(
             endpoint="token/validate",
             json_data={
@@ -57,14 +55,10 @@ class Watchman:
             },
         )
         logging.debug("Checking Validity: {}".format(json.dumps(response)))
-        if response["status"] == "ok":
-            self.is_validated = True
+        return response
 
 
     def send_log(self, log_data):
-        if self.is_validated is False:
-            self.check_token_validity()
-
         if type(log_data) is not WatchmanLog:
             logging.info("Use watchmanlog class to build log object")
             return
