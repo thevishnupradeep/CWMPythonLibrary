@@ -15,7 +15,7 @@ def make_cwm_request(
 ):
     try:
         # url = 'http://localhost:8080/v1'
-        url = 'https://app.codewatchman.com/v1'
+        url = 'https://api.codewatchman.com/v1'
         final_url = '{}/{}'.format(url, endpoint)
         logging.info("Code Watchman URL: {}".format(final_url))
         headers["Credentials"] = json.dumps(Credentials)

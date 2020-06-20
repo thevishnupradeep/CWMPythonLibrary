@@ -5,7 +5,7 @@ with open("./README.md", "r") as fh:
 
 setuptools.setup(
     name="codewatchman",
-    version="0.1.0",
+    version="0.1.2",
     license="MIT",
     author="Code Watchman",
     author_email="codewatchmanapp@gmail.com",
