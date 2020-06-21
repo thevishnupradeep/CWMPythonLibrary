@@ -5,7 +5,7 @@ from codewatchman.WatchmanLog import WatchmanLog
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-tokenData = { "tokenId": "cZX877YbyGxZ7Bj9BCGS", "accessToken": "161d5c6a45841592195389664" }
+tokenData = { "tokenId": "VfY4BJJgE2vgeFbuM576", "accessToken": "4c9538bbfbd21592196292212" }
 instance = Watchman(tokenData["tokenId"], tokenData["accessToken"])
 
 first_log = WatchmanLog(log_code="TESTLOG", message="IT IS WORKING!!!!!", payload={ "test": True })
